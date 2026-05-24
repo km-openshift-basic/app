@@ -32,7 +32,7 @@ public class GreetingResource {
                 "application", "openshift-workshop-app",
                 "version", "1.0.0",
                 "environment", environment,
-                "java.version", System.getProperty("java.version"),
+                "javaVersion", System.getProperty("java.version"),
                 "hostname", hostname());
     }
 

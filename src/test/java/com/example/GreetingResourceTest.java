@@ -28,7 +28,7 @@ class GreetingResourceTest {
                 .body("application", is("openshift-workshop-app"))
                 .body("version", is("1.0.0"))
                 .body("environment", is("test"))
-                .body("java.version", notNullValue())
+                .body("javaVersion", notNullValue())
                 .body("hostname", notNullValue());
     }
 }
