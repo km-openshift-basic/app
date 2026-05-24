@@ -1,0 +1,110 @@
+schemaVersion: 2.2.2
+metadata:
+  name: openshift-workshop
+  displayName: OpenShift Workshop App
+  description: Quarkus REST API with PostgreSQL for OpenShift hands-on workshop
+  language: Java
+  projectType: Quarkus
+projects:
+  - name: app
+    git:
+      remotes:
+        origin: https://github.com/km-openshift-basic/app.git
+  - name: manifests
+    git:
+      remotes:
+        origin: https://github.com/km-openshift-basic/manifests.git
+components:
+  - name: tools
+    container:
+      image: registry.redhat.io/devspaces/udi-rhel9@sha256:7269df763e5ec427253931a8aaa6d9156d923644fc99326bab0dc55754f40d9f
+      env:
+        - name: QUARKUS_HTTP_HOST
+          value: "0.0.0.0"
+        - name: DB_URL
+          value: jdbc:postgresql://localhost:5432/workshop_db
+        - name: DB_USERNAME
+          value: workshop
+        - name: DB_PASSWORD
+          value: workshop
+      endpoints:
+        - name: app
+          exposure: public
+          protocol: https
+          targetPort: 8080
+          path: /hello
+        - name: debug
+          exposure: none
+          protocol: tcp
+          targetPort: 5005
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      memoryLimit: 4G
+      memoryRequest: 2G
+      cpuLimit: "2"
+      cpuRequest: "1"
+      mountSources: true
+  - name: postgresql
+    container:
+      image: registry.redhat.io/rhel9/postgresql-15:latest
+      env:
+        - name: POSTGRESQL_USER
+          value: workshop
+        - name: POSTGRESQL_PASSWORD
+          value: workshop
+        - name: POSTGRESQL_DATABASE
+          value: workshop_db
+      endpoints:
+        - name: postgres
+          exposure: none
+          protocol: tcp
+          targetPort: 5432
+      volumeMounts:
+        - name: pgdata
+          path: /var/lib/pgsql/data
+      memoryLimit: 512Mi
+      memoryRequest: 256Mi
+  - name: m2
+    volume:
+      size: 1Gi
+  - name: pgdata
+    volume:
+      size: 1Gi
+commands:
+  - id: test
+    exec:
+      label: "1. Run tests (H2 in-memory)"
+      component: tools
+      workingDir: ${PROJECTS_ROOT}/app
+      commandLine: mvn test
+      group:
+        kind: build
+        isDefault: false
+  - id: package
+    exec:
+      label: "2. Package the application"
+      component: tools
+      workingDir: ${PROJECTS_ROOT}/app
+      commandLine: mvn package -DskipTests
+      group:
+        kind: build
+        isDefault: true
+  - id: dev
+    exec:
+      label: "3. Start Development mode (Hot reload + debug)"
+      component: tools
+      workingDir: ${PROJECTS_ROOT}/app
+      commandLine: mvn compile quarkus:dev
+      group:
+        kind: run
+        isDefault: true
+  - id: deploy-dev
+    exec:
+      label: "4. Deploy to OpenShift (dev)"
+      component: tools
+      workingDir: ${PROJECTS_ROOT}/manifests
+      commandLine: oc apply -k overlays/dev/
+      group:
+        kind: run
+        isDefault: false
