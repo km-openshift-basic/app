@@ -1,5 +1,6 @@
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.20 AS builder
 
+USER root
 WORKDIR /build
 COPY pom.xml .
 COPY src ./src
