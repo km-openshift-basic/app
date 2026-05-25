@@ -1,0 +1,2 @@
+CREATE SEQUENCE IF NOT EXISTS notes_seq START WITH 1 INCREMENT BY 50;
+SELECT setval('notes_seq', COALESCE((SELECT MAX(id) FROM notes), 0) + 1);
