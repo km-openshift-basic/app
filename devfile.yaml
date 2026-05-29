@@ -5,6 +5,9 @@ metadata:
   description: Quarkus REST API with PostgreSQL for OpenShift hands-on workshop
   language: Java
   projectType: Quarkus
+attributes:
+  che-code.eclipse.org/vscode-extensions:
+    - bierner.markdown-mermaid
 projects:
   - name: app
     git:
