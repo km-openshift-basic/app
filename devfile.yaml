@@ -7,7 +7,7 @@ metadata:
   projectType: Quarkus
 attributes:
   che-code.eclipse.org/vscode-extensions:
-    - bierner.markdown-mermaid
+    - https://open-vsx.org/api/bierner/markdown-mermaid/1.32.1/file/bierner.markdown-mermaid-1.32.1.vsix
 projects:
   - name: app
     git:
